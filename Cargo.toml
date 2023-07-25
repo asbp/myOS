@@ -16,10 +16,31 @@ buddy_system_allocator = "0.9.0"
 hashbrown = "0.14.0"
 pc-keyboard = "0.7.0"
 shlex = {version = "1.1.0", default-features = false}
+pasts = { version = "0.14.3", default-features = false }
+executor = "0.8"
+
+[dependencies.async-std]
+version = "1.7.0"
+default-features = false
+features = ["alloc"]
 
 [dependencies.lazy_static]
 version = "1.0"
 features = ["spin_no_std"]
+
+[dependencies.crossbeam-queue]
+version = "0.2.1"
+default-features = false
+features = ["alloc"]
+
+[dependencies.conquer-once]
+version = "0.2.0"
+default-features = false
+
+[dependencies.futures-util]
+version = "0.3.4"
+default-features = false
+features = ["alloc"]
 
 [profile.dev]
 panic = "abort"

@@ -10,6 +10,10 @@ pub mod idt;
 pub mod intel8259;
 pub mod memory;
 pub mod text_driver;
+pub mod async_queue;
+pub mod str_reader;
+pub mod futures;
+pub mod task;
 
 extern crate alloc;
 

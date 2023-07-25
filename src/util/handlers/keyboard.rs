@@ -6,7 +6,7 @@ use x86_64::structures::idt::InterruptStackFrame;
 
 use crate::util::{
     event_emitter::EVENT_EMITTER,
-    intel8259::{InterruptIndex, PICS},
+    intel8259::{InterruptIndex, PICS}, task::keyboard::add_scancode,
 };
 
 pub extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStackFrame) {
@@ -49,8 +49,12 @@ fn emit_unicode_key(char: &char) {
     EVENT_EMITTER
         .lock()
         .emit("keyboard_unicode_key", &[&String::from(char.to_string())]);
+
+    add_scancode(String::from(*char));
 }
 
 fn emit_raw_key(code_str: &str) {
     EVENT_EMITTER.lock().emit("keyboard_raw_key", &[code_str]);
+
+    add_scancode(code_str.to_string());
 }

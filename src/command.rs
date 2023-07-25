@@ -1,15 +1,11 @@
 use alloc::{
     collections::LinkedList,
     string::{String, ToString},
-    sync::Arc,
 };
 use shlex::split;
 use spin::Mutex;
 
-use crate::{
-    print, println,
-    util::{event_emitter::EVENT_EMITTER, text_driver::TEXT_DRIVER},
-};
+use crate::{print, println, util::str_reader::STDIN};
 
 pub struct CommandInterpreter {
     command: String,
@@ -22,23 +18,15 @@ impl CommandInterpreter {
         };
     }
 
-    pub fn listener(&mut self, key: &str) {
-        if key == "\n" {
-            println!();
+    pub async fn start(&mut self) {
+        loop {
+            self.command.clear();
+            print!("> ");
+            let my_cmd = STDIN.lock().read().await;
+
+            self.command.push_str(&my_cmd);
             self.parse_command();
             println!();
-            print!("> ");
-            self.command.clear();
-        } else {
-            if key == "\u{8}" {
-                if self.command.len() > 0 {
-                    TEXT_DRIVER.lock().write_str(key);
-                    self.command.pop();
-                }
-            } else {
-                TEXT_DRIVER.lock().write_str(key);
-                self.command.push_str(key);
-            }
         }
     }
 
@@ -93,17 +81,7 @@ pub fn add(args: &mut LinkedList<String>) {
 }
 
 pub fn start_command_interpreter() {
-    println!();
-    print!("> ");
-
-    EVENT_EMITTER.lock().on(
-        "keyboard_unicode_key",
-        Arc::new(|args| {
-            let key = args[0];
-
-            COMMAND.lock().listener(key);
-        }),
-    );
+    executor::run(async { COMMAND.lock().start().await });
 }
 
 lazy_static::lazy_static! {
